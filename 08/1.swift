@@ -6,16 +6,16 @@ let fileContents = try! String(contentsOf: fileURL)
 let lines = fileContents.components(separatedBy: "\n")
 
 struct Machine {
-	let width: Int
-	let height: Int
+	let gridWidth: Int
+	let gridHeight: Int
 	var grid: [Bool]
 	var litPixels: Int {
 		return grid.filter({ $0 }).count
 	}
 	
 	init(width: Int, height: Int) {
-		self.width = width
-		self.height = height
+		self.gridWidth = width
+		self.gridHeight = height
 		grid = [Bool](repeating: false, count: width * height)
 	}
 	
@@ -32,22 +32,22 @@ struct Machine {
 	
 	/** "rotate row y=A by B" */
 	mutating func rotate(row: Int, by rotationCount: Int) {
-		var tempCells = [Bool](repeating: false, count: width)
-		for col in 0..<width {
-			tempCells[(col+rotationCount) % width] = self[row, col]
+		var tempCells = [Bool](repeating: false, count: gridWidth)
+		for col in 0..<gridWidth {
+			tempCells[(col+rotationCount) % gridWidth] = self[row, col]
 		}
-		for col in 0..<width {
+		for col in 0..<gridWidth {
 			self[row, col] = tempCells[col]
 		}
 	}
 	
 	/** "rotate column x=A by B" */
 	mutating func rotate(column col: Int, by rotationCount: Int) {
-		var tempCells = [Bool](repeating: false, count: height)
-		for row in 0..<height {
-			tempCells[(row+rotationCount) % height] = self[row, col]
+		var tempCells = [Bool](repeating: false, count: gridHeight)
+		for row in 0..<gridHeight {
+			tempCells[(row+rotationCount) % gridHeight] = self[row, col]
 		}
-		for row in 0..<height {
+		for row in 0..<gridHeight {
 			self[row, col] = tempCells[row]
 		}
 	}
@@ -77,9 +77,9 @@ struct Machine {
 	// MARK: - Debugging
 	
 	func dump() {
-		for row in 0..<height {
+		for row in 0..<gridHeight {
 			var rowString = ""
-			for col in 0..<width {
+			for col in 0..<gridWidth {
 				rowString += self[row, col] ? "#" : "."
 			}
 			print(rowString)
@@ -91,18 +91,18 @@ struct Machine {
 	subscript(row: Int, column: Int) -> Bool {
 		get {
 			assert(indexIsValid(row: row, column: column), "Index out of range")
-			return grid[(row * width) + column]
+			return grid[(row * gridWidth) + column]
 		}
 		set {
 			assert(indexIsValid(row: row, column: column), "Index out of range")
-			grid[(row * width) + column] = newValue
+			grid[(row * gridWidth) + column] = newValue
 		}
 	}
 
 	// MARK: - Private methods
 		
 	private func indexIsValid(row: Int, column: Int) -> Bool {
-		return row >= 0 && row < height && column >= 0 && column < width
+		return row >= 0 && row < gridHeight && column >= 0 && column < gridWidth
 	}
 }
 
