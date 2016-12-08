@@ -19,6 +19,9 @@ struct Machine {
 		grid = [Bool](repeating: false, count: width * height)
 	}
 	
+	// MARK: - Pixel operations
+	
+	/** "rect AxB" */
 	mutating func lightPixels(rectWidth: Int, rectHeight: Int) {
 		for row in 0..<rectHeight {
 			for col in 0..<rectWidth {
@@ -27,6 +30,7 @@ struct Machine {
 		}
 	}
 	
+	/** "rotate row y=A by B" */
 	mutating func rotate(row: Int, by rotationCount: Int) {
 		var tempCells = [Bool](repeating: false, count: width)
 		for col in 0..<width {
@@ -37,6 +41,7 @@ struct Machine {
 		}
 	}
 	
+	/** "rotate column x=A by B" */
 	mutating func rotate(column col: Int, by rotationCount: Int) {
 		var tempCells = [Bool](repeating: false, count: height)
 		for row in 0..<height {
@@ -47,6 +52,7 @@ struct Machine {
 		}
 	}
 	
+	/** Parse an input command and perform the specified operation. */
 	mutating func doOperation(_ cmd: String) {
 		let parts = cmd.components(separatedBy: " ")
 		switch parts[0] {
@@ -67,6 +73,8 @@ struct Machine {
 			default: fatalError("Unexpected command in '\(cmd)'")
 		}
 	}
+	
+	// MARK: - Debugging
 	
 	func dump() {
 		for row in 0..<height {
@@ -90,7 +98,9 @@ struct Machine {
 			grid[(row * width) + column] = newValue
 		}
 	}
-	
+
+	// MARK: - Private methods
+		
 	private func indexIsValid(row: Int, column: Int) -> Bool {
 		return row >= 0 && row < height && column >= 0 && column < width
 	}
