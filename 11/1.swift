@@ -217,18 +217,110 @@ class Move {
 	}
 }
 
+class QueueNode<T> {
+	let value: T
+	var next: QueueNode<T>?
+	init(value: T) {
+		self.value = value
+	}
+}
+
+struct Queue<T> {
+	private(set) var count: Int = 0
+	private var head: QueueNode<T>?
+	private var tail: QueueNode<T>?
+
+	mutating func push(_ value: T) {
+		let node = QueueNode<T>(value: value)
+		if let oldTail = tail {
+			oldTail.next = node
+			tail = node
+		} else {
+			tail = node
+			head = node
+		}
+		count += 1
+	}
+
+	mutating func pop() -> T? {
+		if let oldHead = head {
+			head = oldHead.next
+			if head == nil {
+				tail = nil
+			}
+			count -= 1
+			return oldHead.value
+		} else {
+			return nil
+		}
+	}
+}
+
+
+
 let building = Building(floorMasks, 0)
 print(building)
 
 let depthCheckpointFactor = 25
 var lastCheckpoint = 50
 var visitedBuildingMasks = Set<Int>()
-var queue = [Move(depth: 0, prev: nil, resultOfMove: building)]
+
+
+//var queue = [Move(depth: 0, prev: nil, resultOfMove: building)]
+//var maxQueueLength = queue.count
+//var maxDepth = 0
+//NSLog("starting search")
+//while !queue.isEmpty {
+//	let move = queue.removeFirst()
+//	if move.depth >= lastCheckpoint && move.depth % depthCheckpointFactor == 0 {
+//		print("about to go to depth \(move.depth), queue length is \(queue.count)")
+//		lastCheckpoint += depthCheckpointFactor
+//	}
+//	if move.resultOfMove.missionAccomplished {
+//		print("Mission accomplished at depth \(move.depth)")
+//		var m = move
+//		while m.prev != nil {
+//			print(m.resultOfMove)
+//			m = m.prev!
+//		}
+//		break
+//	}
+//	let possibleLoadMasks = move.resultOfMove.possibleLoadMasks()
+//	for loadMask in possibleLoadMasks {
+//		for dir in [-1, 1] {
+//			if let b2 = move.resultOfMove.resultOfMove(loadMask: loadMask, direction: dir) {
+//				if visitedBuildingMasks.contains(b2.mask) {
+//					continue
+//				}
+//				visitedBuildingMasks.insert(b2.mask)
+//				if visitedBuildingMasks.count % 5000000 == 0 {
+//					NSLog("visited: %ld", visitedBuildingMasks.count)
+//				}
+//				if b2.isDeadly {
+//					continue
+//				}
+//				queue.append(Move(depth: move.depth+1, prev: move, resultOfMove: b2))
+//				if maxQueueLength < queue.count {
+//					maxQueueLength = queue.count
+//					if maxQueueLength % 50000 == 0 {
+//						NSLog("maxQueueLength: %ld", maxQueueLength)
+//					}
+//				}
+//			}
+//		}
+//	}
+//	if maxDepth < move.depth {
+//		maxDepth = move.depth
+//	}
+//}
+//NSLog("maxQueueLength: %ld, maxDepth: %ld, visited: %ld", maxQueueLength, maxDepth, visitedBuildingMasks.count)
+var queue = Queue<Move>()
+queue.push(Move(depth: 0, prev: nil, resultOfMove: building))
 var maxQueueLength = queue.count
 var maxDepth = 0
 NSLog("starting search")
-while !queue.isEmpty {
-	let move = queue.removeFirst()
+while queue.count > 0 {
+	let move = queue.pop()!
 	if move.depth >= lastCheckpoint && move.depth % depthCheckpointFactor == 0 {
 		print("about to go to depth \(move.depth), queue length is \(queue.count)")
 		lastCheckpoint += depthCheckpointFactor
@@ -256,7 +348,7 @@ while !queue.isEmpty {
 				if b2.isDeadly {
 					continue
 				}
-				queue.append(Move(depth: move.depth+1, prev: move, resultOfMove: b2))
+				queue.push(Move(depth: move.depth+1, prev: move, resultOfMove: b2))
 				if maxQueueLength < queue.count {
 					maxQueueLength = queue.count
 					if maxQueueLength % 50000 == 0 {
@@ -271,6 +363,8 @@ while !queue.isEmpty {
 	}
 }
 NSLog("maxQueueLength: %ld, maxDepth: %ld, visited: %ld", maxQueueLength, maxDepth, visitedBuildingMasks.count)
+
+
 
 
 
