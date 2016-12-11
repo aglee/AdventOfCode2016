@@ -1,37 +1,37 @@
 import Foundation
 
-/*
+enum InputOption {
+	case test
+	case partOne
+	case partTwo
+}
 
-.  .  .  .  .  .  .  .  .  .
-.  .  .  .  .  .  XG XM RG RM
-.  .  .  PM .  SM .  .  .  .
-TG TM PG .  SG .  .  .  .  .
-*/
-
-/*
-.  .  .  .
-.  .  LG .
-HG .  .  .
-.  HM .  LM
-*/
-//let elems = ["H", "L"]
-//let floorMasks = [0b0101, 0b1000, 0b0010, 0b0000]
-
-/*
-The first floor contains a thulium generator, a thulium-compatible microchip, a plutonium generator, and a strontium generator.
-The second floor contains a plutonium-compatible microchip and a strontium-compatible microchip.
-The third floor contains a promethium generator, a promethium-compatible microchip, a ruthenium generator, and a ruthenium-compatible microchip.
-The fourth floor contains nothing relevant.
-
-.  .  .  .  .  .  .  .  .  .
-.  .  .  .  .  .  XG XM RG RM
-.  .  .  PM .  SM .  .  .  .
-TG TM PG .  SG .  .  .  .  .
-*/
-//let elems = ["T", "P", "S", "X", "R"]
-//let floorMasks = [0b1110100000, 0b0001010000, 0b0000001111, 0b0000000000]
-let elems = ["T", "P", "S", "X", "R", "E", "D"]
-let floorMasks = [0b11101000001111, 0b00010100000000, 0b00000011110000, 0b0000000000]
+let elems: [String]
+let floorMasks: [Int]
+let runOption = InputOption.partOne  // Change this to try different inputs.
+switch runOption {
+	case .test: 
+		// .  .  .  .
+		// .  .  LG .
+		// HG .  .  .
+		// .  HM .  LM
+		elems = ["H", "L"]
+		floorMasks = [0b0101, 0b1000, 0b0010, 0b0000]
+	case .partOne:
+		// .  .  .  .  .  .  .  .  .  .
+		// .  .  .  .  .  .  XG XM RG RM
+		// .  .  .  PM .  SM .  .  .  .
+		// TG TM PG .  SG .  .  .  .  .
+		elems = ["T", "P", "S", "X", "R"]
+		floorMasks = [0b1110100000, 0b0001010000, 0b0000001111, 0b0000000000]
+	case .partTwo:
+		// F4 .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  
+		// F3 .  .  .  .  .  .  .  XG XM RG RM .  .  .  .  
+		// F2 .  .  .  .  PM .  SM .  .  .  .  .  .  .  .  
+		// F1 E  TG TM PG .  SG .  .  .  .  .  EG EM DG DM 
+		elems = ["T", "P", "S", "X", "R", "E", "D"]
+		floorMasks = [0b11101000001111, 0b00010100000000, 0b00000011110000, 0b0000000000]
+}
 
 extension Int {
 	func brief(_ digits: Int? = nil) -> String {
@@ -73,12 +73,6 @@ struct Group: CustomStringConvertible {
 		return false
 	}
 
-/*
-	.  .  .  .  .  .  .  .  .  .
-	.  .  .  .  .  .  XG XM RG RM
-	.  .  .  PM .  SM .  .  .  .
-	TG TM PG .  SG .  .  .  .  .
-*/
 	var description: String {
 		var d = ""
 		var m = mask
@@ -107,8 +101,6 @@ struct Group: CustomStringConvertible {
 		return loads
 	}
 }
-
-var rejectedBuildingMasks = Set<Int>()
 
 class Building: CustomStringConvertible {
 	let floors: [Group]
