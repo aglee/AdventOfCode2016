@@ -8,7 +8,7 @@ enum InputOption {
 
 let elems: [String]
 let floorMasks: [Int]
-let runOption = InputOption.partOne  // Change this to try different inputs.
+let runOption = InputOption.test  // Change this to try different inputs.
 switch runOption {
 	case .test: 
 		// .  .  .  .
@@ -207,6 +207,18 @@ class Move {
 		self.prev = prev
 		self.resultOfMove = resultOfMove
 	}
+	
+	func dump() {
+		var moves: [Move] = []
+		var m: Move? = self
+		while m != nil {
+			moves.append(m!)
+			m = m!.prev
+		}
+		for m in moves.reversed() {
+			print(m.resultOfMove)
+		}
+	}
 }
 
 class QueueNode<T> {
@@ -248,56 +260,15 @@ struct Queue<T> {
 	}
 }
 
-protocol MoveQueue {
-	var count: Int { get }
-	mutating func push(_: Move)
-	mutating func pop() -> Move?
-}
-
-struct MoveQueueUsingArray: MoveQueue {
-	private var moves: [Move] = []
-
-	var count: Int {
-		return moves.count
-	}
-
-	mutating func push(_ move: Move) {
-		moves.append(move)
-	}
-	
-	mutating func pop() -> Move? {
-		return moves.isEmpty ? nil : moves.removeFirst()
-	}
-}
-
-struct MoveQueueUsingLinkedList: MoveQueue {
-	private var moves = Queue<Move>()
-
-	var count: Int {
-		return moves.count
-	}
-
-	mutating func push(_ move: Move) {
-		moves.push(move)
-	}
-	
-	mutating func pop() -> Move? {
-		return moves.pop()
-	}
-}
-
-
-func doSearch(usingLinkedList: Bool) {
-	NSLog("starting search using %@ for the BFS queue", usingLinkedList ? "linked list" : "array")
+func doSearch() {
+	NSLog("START")
 
 	let building = Building(floorMasks, 0)
-	print(building)
-
 	let depthCheckpointFactor = 25
 	var lastCheckpoint = 50
 	var visitedBuildingMasks = Set<Int>()
 
-	var queue: MoveQueue = usingLinkedList ? MoveQueueUsingLinkedList() : MoveQueueUsingArray()
+	var queue = Queue<Move>()
 	queue.push(Move(depth: 0, prev: nil, resultOfMove: building))
 
 	var maxQueueLength = queue.count
@@ -308,26 +279,20 @@ func doSearch(usingLinkedList: Bool) {
 			lastCheckpoint += depthCheckpointFactor
 		}
 		if move.resultOfMove.missionAccomplished {
-			NSLog("Mission accomplished at depth %ld", move.depth)
-			NSLog("maxQueueLength: %ld, maxDepth: %ld, visited: %ld", maxQueueLength, visitedBuildingMasks.count)
-			
-			// Note: this displays the moves in reverse order.
-//			var m = move
-//			while m.prev != nil {
-//				print(m.resultOfMove)
-//				m = m.prev!
-//			}
+			NSLog("END at depth %ld", move.depth)
+			NSLog("maxQueueLength: %ld, visited states: %ld", maxQueueLength, visitedBuildingMasks.count)
+			print("")
+			move.dump()
 			break
 		}
 		let possibleLoadMasks = move.resultOfMove.possibleLoadMasks()
 		for loadMask in possibleLoadMasks {
 			for dir in [-1, 1] {
 				if let b2 = move.resultOfMove.resultOfMove(loadMask: loadMask, direction: dir) {
-					let b2mask = b2.mask
-					if visitedBuildingMasks.contains(b2mask) {
+					if visitedBuildingMasks.contains(b2.mask) {
 						continue
 					}
-					visitedBuildingMasks.insert(b2mask)
+					visitedBuildingMasks.insert(b2.mask)
 					if visitedBuildingMasks.count % 5000000 == 0 {
 						NSLog("visited: %ld", visitedBuildingMasks.count)
 					}
@@ -347,8 +312,7 @@ func doSearch(usingLinkedList: Bool) {
 	}
 }
 
-doSearch(usingLinkedList: false)
-doSearch(usingLinkedList: true)
+doSearch()
 
 
 //print(Group(mask: 0))
