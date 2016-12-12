@@ -1,3 +1,4 @@
+import datetime
 import inspect, os
 
 def readInputLines():
@@ -17,8 +18,14 @@ def run(registers):
 		return registers[term] if (term in 'abcd') else int(term)
 
 	instructions = loadInstructions()
+
+	print("[{}] START".format(datetime.datetime.now()))
 	pc = 0
+	numCycles = 0
 	while True:
+		numCycles += 1
+		if numCycles % 1000000 == 0:
+			print("[{}] numCycles = {}".format(datetime.datetime.now(), numCycles))
 		(cmd, args) = instructions[pc]
 		if cmd == 'jnz':  # jnz <reg_or_int> <jump>
 			pc += value(args[1]) if value(args[0]) != 0 else 1
@@ -34,5 +41,6 @@ def run(registers):
 			pc += 1
 		if pc >= len(instructions):
 			break
+	print("[{}] DONE -- {} cycles".format(datetime.datetime.now(), numCycles))
 
 	return registers
