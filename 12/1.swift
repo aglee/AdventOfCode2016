@@ -29,18 +29,18 @@ func run() {
 		}
 		let parts = instructions[pc]
 		var jump = 1
-		switch parts[0] {
-			case "cpy":
-				registers[parts[2]]! = value(parts[1])
-			case "inc":
-				registers[parts[1]]! += 1
-			case "dec":
-				registers[parts[1]]! -= 1
-			case "jnz":
-				if value(parts[1]) != 0 {
-					jump = Int(parts[2])!
-				}
-			default: fatalError("Can't parse instruction '\(instructions[pc])")
+		if parts[0] == "jnz" {
+			if value(parts[1]) != 0 {
+				jump = Int(parts[2])!
+			}
+		} else if parts[0] == "cpy" {
+			registers[parts[2]] = value(parts[1])
+		} else if parts[0] == "inc" {
+			registers[parts[1]]! += 1
+		} else if parts[0] == "dec" {
+			registers[parts[1]]! -= 1
+		} else {
+			fatalError("Can't parse instruction '\(parts)")
 		}
 		pc += jump
 		if pc >= instructions.count {
