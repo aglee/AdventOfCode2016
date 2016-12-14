@@ -1,3 +1,4 @@
+import datetime
 import md5
 import re
 
@@ -15,12 +16,14 @@ def solve(salt, times_to_hash, verbose):
 	key_producing_indexes = []
 	index = -1
 	WHEN_TO_STOP = 100000
+	print("[{}] START".format(datetime.datetime.now()))
 	while True:
 		index += 1
 		if index >= WHEN_TO_STOP:
 			key_producing_indexes.sort()
 			print('stopping at index = {} after finding {} key-producing indexes'.format(index, len(key_producing_indexes)))
 			print('64th key-producing index is {}'.format(key_producing_indexes[63]))
+			print("[{}] END".format(datetime.datetime.now()))
 			return key_producing_indexes[63]
 
 		# See if we contain a triple.
@@ -60,6 +63,7 @@ def solve(salt, times_to_hash, verbose):
 seed = 'qzyelonm'  # 'abc' or 'qzyelonm'
 verbose = False  # True or False
 print('Part 1 answer: {}'.format(solve(seed, 1, verbose)))
+print("")
 print('Part 2 answer: {}'.format(solve(seed, 2017, verbose)))
 
 
