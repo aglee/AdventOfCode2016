@@ -182,6 +182,33 @@ NSLog("AFTER")
 
 
 
+func solveDay13Part1Again() {
+	let maze = MazeDay13(favoriteNumber: 1352)
+	var visited = Set<Point>()
+	var frontier = Set<Point>()
+	frontier.insert(Point(1, 1))
+	for depth in 0..<10000 {
+		// Find all reachable neighbors of the current frontier,
+		// and construct the next frontier.
+		var newFrontier = Set<Point>()
+		for point in frontier {
+			if point.x == 31 && point.y == 39 {
+				print("solveDay13Part1Again -- depth = \(depth)")
+				return
+			}
+			visited.insert(point)
+			for neighbor in maze.neighbors(point) {
+				if !visited.contains(neighbor) {
+					newFrontier.insert(neighbor)
+				}
+			}
+		}
+		frontier = newFrontier
+	}
+	print("visited \(visited.count)")
+}
+solveDay13Part1Again()
+
 func solveDay13Part2(_ numSteps: Int) {
 	let maze = MazeDay13(favoriteNumber: 1352)
 	var visited = Set<Point>()
