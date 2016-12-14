@@ -1,5 +1,20 @@
 import Foundation
 
+/*
+This was my first attempt, using a queue to do the BFS.
+It doesn't check for already-visited squares and is way too inefficient.
+It also assumes fixed grid dimensions and stores the square contents in
+an array, when the actual maze is infinite and we can't predict the exact
+dimensions it will ultimately need.
+It works on the example goal, but takes unacceptably long for the real goal.
+
+WORKS:
+solveSimpleMaze(width: 10, height: 7, fav: 10, targetX: 7, targetY: 4)
+
+BLOWS UP:
+solveSimpleMaze(width: 40, height: 50, fav: 1352, targetX: 31, targetY: 39)
+*/
+
 enum Cell: String {
 	case space = "⬜️"  //"◻️"  //""."
 	case wall = "⬛️"  //"#"
@@ -110,15 +125,4 @@ func solveSimpleMaze(width: Int, height: Int, fav: Int, targetX: Int, targetY: I
 	}
 	maze.dump()
 }
-
-
-
-//var m = Maze(width: 40, height: 50, fav: 1352)
-//m[31, 39] = .mark
-//m.dump()
-
-//solveSimpleMaze(width: 10, height: 7, fav: 10, targetX: 7, targetY: 4)
-//solveSimpleMaze(width: 40, height: 50, fav: 1352, targetX: 31, targetY: 39)
-
-
 

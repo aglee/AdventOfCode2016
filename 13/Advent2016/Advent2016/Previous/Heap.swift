@@ -119,19 +119,23 @@ struct Heap<T> {
 	}
 }
 
-//var heap = Heap<Int>()
-//var list: [Int] = []
-//for _ in 0..<10 {
-//	let n = Int(arc4random_uniform(50))
-//	heap.insert(n)
-//	list.append(n)
-//}
-//let a = heap.sorted()
-//let b = Array(list.sorted().reversed())
-//print(a)
-//print(b)
-//if a != b {
-//	print("wtf")
-//}
-//
-//
+/*
+// Testing Heap.
+
+var heap = Heap<Int>(priorityBlock: { $0 < $1 })
+var list: [Int] = []
+for _ in 0..<10 {
+let n = Int(arc4random_uniform(50))
+heap.insert(n)
+list.append(n)
+}
+let a = heap.sorted()
+let b = Array(list.sorted()/*.reversed()*/)
+print(a)
+print(b)
+if a != b {
+print("wtf")
+}
+*/
+
+
