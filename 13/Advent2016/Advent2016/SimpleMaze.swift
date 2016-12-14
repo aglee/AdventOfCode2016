@@ -1,9 +1,9 @@
 import Foundation
 
 enum Cell: String {
-	case space = "."
-	case wall = "#"
-	case mark = "O"
+	case space = "⬜️"  //"◻️"  //""."
+	case wall = "⬛️"  //"#"
+	case mark = "❤️"  //🐙"O"
 }
 
 struct SimpleMaze {
