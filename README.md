@@ -5,8 +5,11 @@ My solutions to [Advent of Code 2016](http://adventofcode.com/2016).  I did some
 I've been using [CodeRunner](https://coderunnerapp.com/) to code, run, and debug these programs.  If you don't have CodeRunner you can run them from the command line:
 
 ```bash
-# Swift
+# Swift when you have one standalone file
 swift 2.swift
+
+# Swift when you have multiple files, including main.swift
+swiftc -o main *.swift && ./main
 ```
 
 ```bash
