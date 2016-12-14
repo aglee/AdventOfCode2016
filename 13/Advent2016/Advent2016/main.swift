@@ -176,8 +176,9 @@ func solveDay13Part1(favoriteNumber: Int, goal: Point) {
 	}
 	print("Bummer, failed to find solution")
 }
-
+NSLog("BEFORE")
 solveDay13Part1(favoriteNumber: 1352, goal: Point(31, 39))
+NSLog("AFTER")
 
 
 
