@@ -6,9 +6,7 @@ def solve(disc_pairs):
 	desired_mod_values = []
 	for i, (modulus, disc_start) in enumerate(disc_pairs):
 		# For any given disc, assuming the capsule falls through the ones above
-		# it, the capsule is effectively going to fall a distance of disc_start
-		# followed by (i + 1).  So we want the initial time t to be modulus
-		# minus that.
+		# it, the capsule is going to fall a distance of t followed by (i + 1).
 		desired_value = (modulus - disc_start - (i + 1)) % modulus
 		desired_mod_values.append((modulus, desired_value))
 		print('we want t % {} == {}'.format(modulus, desired_value))
