@@ -1,34 +1,33 @@
 def solve(disc_pairs):
 	print(disc_pairs)
-	mod_values_of_t = []
-	for i, (modulo, disc_start) in enumerate(disc_pairs):
-		mod_value = (modulo - disc_start - i - 1) % modulo
-		mod_values_of_t.append(mod_value)
-		print('we want t = {} mod {}'.format(mod_value, modulo))
+	
+	# We want the solution t to have various values modulo various moduli.
+	# Figure out what those values and moduli are.
+	desired_mod_values = []
+	for i, (modulus, disc_start) in enumerate(disc_pairs):
+		# For any given disc, assuming the capsule falls through the ones above
+		# it, the capsule is effectively going to fall a distance of disc_start
+		# followed by (i + 1).  So we want the initial time t to be modulus
+		# minus that.
+		desired_value = (modulus - disc_start - (i + 1)) % modulus
+		desired_mod_values.append((modulus, desired_value))
+		print('we want t % {} == {}'.format(modulus, desired_value))
 
-	all_modulos = map(lambda x: x[0], disc_pairs)
-	product_of_modulos = reduce(lambda x, y: x*y, all_modulos)
-	print('product_of_modulos = {}'.format(product_of_modulos))
-	num_list = [x for x in range(product_of_modulos)]
-	for i, (modulo, disc_start) in enumerate(disc_pairs):
-		mod_value = (modulo - disc_start - i - 1) % modulo
-		for k in range(0, product_of_modulos):
-			if k % modulo != mod_value:
-				num_list[k] = None
-	filtered_list = [x for x in num_list if x is not None]
-	answer = filtered_list[0]
-	print('{} numbers remain in list, list begins with {}'.format(len(filtered_list), filtered_list[:6]))
-	for i, modulo in enumerate(all_modulos):
-		print('{}: answer = {} mod {} (recall {})'.format(i + 1, answer % modulo, modulo, disc_pairs[i]))
+	# Keep trying successive values of t until we find one that works.
+	t = 0
+	while True:
+		if reduce(lambda x, y: x and y, [t % mod == desired_value for (mod, desired_value) in desired_mod_values]):
+			print('answer seems to be {}'.format(t))
+			break
+		t += 1
+	
+	# Print some sanity-checking info to convince myself the answer is right.
+	for i, (mod, desired) in enumerate(desired_mod_values):
+		print('{}: {} % {} == {} (recall {})'.format(i + 1, t, mod, t % mod, disc_pairs[i]))
 
 input = [(13, 1), (19, 10), (3, 2), (7, 1), (5, 3), (17, 5)]
 solve(input)
 print("")
 input.append((11, 0))
 solve(input)
-
-
-
-
-
 
