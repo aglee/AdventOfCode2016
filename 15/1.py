@@ -1,3 +1,7 @@
+# My code does a brute-force search.  Mike Heaton pointed out that this problem
+# is an example of the Chinese Remainder Theorem:
+# <https://en.wikipedia.org/wiki/Chinese_remainder_theorem#Theorem_statement>
+
 def solve(disc_pairs):
 	print(disc_pairs)
 	
@@ -5,9 +9,9 @@ def solve(disc_pairs):
 	# Figure out what those values and moduli are.
 	desired_mod_values = []
 	for i, (modulus, disc_start) in enumerate(disc_pairs):
-		# For any given disc, assuming the capsule falls through the ones above
-		# it, the capsule is going to fall a distance of t followed by (i + 1).
-		desired_value = (modulus - disc_start - (i + 1)) % modulus
+		# Assuming the capsule falls through all the discs, it will reach each
+		# disc after falling a distance of t + (i + 1).
+		desired_value = (-disc_start - (i + 1)) % modulus
 		desired_mod_values.append((modulus, desired_value))
 		print('we want t % {} == {}'.format(modulus, desired_value))
 
