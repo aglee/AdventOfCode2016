@@ -1,5 +1,9 @@
 import Foundation
 
+let dirURL = URL(fileURLWithPath: CommandLine.arguments[0]).deletingLastPathComponent()
+let fileURL = dirURL.appendingPathComponent("input.txt")  // "input.txt" or "test.txt"
+let fileContents = try! String(contentsOf: fileURL)
+
 struct RowOfTiles {
 	private static let trapChar: Character = "^"
 	private static let safeChar: Character = "."
@@ -55,14 +59,12 @@ func generateRows(first: String, count: Int, verbose: Bool = true) {
 //generateRows(first: "..^^.", count: 3)  // Should say 6 safe tiles.
 //generateRows(first: ".^^.^.^^^^", count: 10)  // Should say 38 safe tiles.
 
-let realInput = ".^^^.^.^^^.^.......^^.^^^^.^^^^..^^^^^.^.^^^..^^.^.^^..^.^..^^...^.^^.^^^...^^.^.^^^..^^^^.....^...."
-
 NSLog("START PART 1")
-generateRows(first: realInput, count: 40, verbose: false)  // Part 1
+generateRows(first: fileContents, count: 40, verbose: false)  // Part 1
 NSLog("END PART 1")
 print("")
 NSLog("START PART 2")
-generateRows(first: realInput, count: 400000, verbose: false)  // Part 2
+generateRows(first: fileContents, count: 400000, verbose: false)  // Part 2
 NSLog("END PART 2")
 
 
