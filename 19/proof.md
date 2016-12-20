@@ -34,7 +34,7 @@ X [4]   (2 remaining)
 [X]   (1 remaining)
 </pre>
 
-**Claim 1 (n = 2k): Suppose n = 2k and player X starts at position k (just before the halfway point in the list).  After k iterations, X will again be at the end of the list (now at position k).**
+**Claim 1 (`n = 2k`): Suppose n = 2k and player X starts at position k (just before the halfway point in the list).  After k iterations, X will again be at the end of the list (now at position k).**
 
 Here is an example that helps visualize this claim:
 
@@ -53,7 +53,7 @@ _ _ _ [_] _ _ X   (7 remaining)
 
 You can see that because X starts in the first half of the list, it stays in the first half of the list until being rotated to the end.
 
-**Claim 2 (n = 3k): Suppose n = 3k and player X starts at the end of the list (in position n).  After 2k iterations X will again be at the end of the list (now at position k).**
+**Claim 2 (`n = 3k`): Suppose n = 3k and player X starts at the end of the list (in position n).  After 2k iterations X will again be at the end of the list (now at position k).**
 
 It suffices to show that after k iterations we have the situation described in Claim 1.  Here is an example that helps show this is true:
 
@@ -70,7 +70,7 @@ _ _ _ _ X [1] 2 3 4 5   (10 remaining)
 
 Note how the first k players have been rotated in order to the end of the list.
 
-**Claim 3 (n = 3**k): Suppose n is a power of 3.  Then n is the winning position for the whole game.**
+**Claim 3 (`n = 3**k`): Suppose n is a power of 3.  Then n is the winning position for the whole game.**
 
 This follows from Claim 2.  Suppose player X starts at the end of the list.  Each time the list is shortened by exactly 2/3, X will again be at the end of the list.  This will continue to be true until the list only has 1 element, namely X.
 
