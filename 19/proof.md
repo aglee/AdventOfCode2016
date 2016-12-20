@@ -86,6 +86,8 @@ This follows immediately from Claim 3.
 
 Suppose player X starts at position r.  The r'th iteration will rotate X to the end of the list.  At that point, r players will have been removed, so the number of players remaining will be a power of 3, and Claim 3 tells us X will win.
 
+This is really the same as Case 1.  In Case 1, r = 0 = n mod n.
+
 **Case 3: n = 2p + r.  The winning position is p+2r.**
 
 Suppose player X starts at position p+2r.  With each of the first r iterations, X's position decreases by two -- one because of a player being eliminated, and one because the first player in the list gets rotated to the end.  Thus after r iterations, X is at position p among a list of 2p players.  Claim 1 tells us that after p more iterations the list will contain p players with X again at the end.  Claim 3 tells us X will be the winner.
