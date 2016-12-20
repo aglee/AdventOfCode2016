@@ -40,10 +40,10 @@ def winning_position(num_players):
 	r = num_players % power_of_3
 	if power_of_3 == num_players:
 		return power_of_3
-	elif 2*power_of_3 <= num_players:
-		return power_of_3 + 2*r
-	else:
+	elif power_of_3 + r == num_players:
 		return r
+	else:
+		return power_of_3 + 2*r
 
 def show_whole_game(n, verbosity = 1):
 	w = winning_position(n)

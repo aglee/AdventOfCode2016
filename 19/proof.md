@@ -7,11 +7,11 @@ def winning_position(num_players):
 	power_of_3 = 3 ** int(floor(log(num_players, 3)))
 	r = num_players % power_of_3
 	if power_of_3 == num_players:
-		return power_of_3
-	elif 2*power_of_3 <= num_players:
-		return power_of_3 + 2*r
+		return power_of_3  # See "Case 1" below.
+	elif power_of_3 + r == num_players:
+		return r  # See "Case 2" below.
 	else:
-		return r
+		return power_of_3 + 2*r  # See "Case 3" below.
 ```
 
 I suspect there is a more concise way to express this in code.  I also wouldn't be surprised if there's a shorter proof.  I won't prove everything in detail; I'll rely on illustrative examples and leave things as exercises for the reader.
