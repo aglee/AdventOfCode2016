@@ -5,7 +5,7 @@ filePath = os.path.join(fileDir, "input.txt")  # "input.txt" or "test.txt"
 lines = [line.rstrip('\n') for line in open(filePath)]
 
 # Represent each range of blacklisted addresses as a (min, max) pair.
-address_ranges = map(lambda x: map(lambda y: int(y), x.split('-')), lines)
+address_ranges = map(lambda x: map(int, x.split('-')), lines)
 #address_ranges = [[5, 8], [0, 2], [4, 7]]
 
 # Sort the ranges in order of increasing min.
