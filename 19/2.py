@@ -17,7 +17,7 @@ def solve(num, verbose = False):
 	while True:
 		elf_to_remove = add_surv_index(i, num_surv/2)
 		if verbose:
-			print('[{}] {} -- i = {}, elf to remove is {}'.format(num_surv, elves, i, elf_to_remove+1))
+			print('[{}] {} -- i = {}, elf to remove is {}'.format(num_surv, elves, i+1, elf_to_remove+1))
 		elves[elf_to_remove] = False
 		num_surv -= 1
 		if num_surv > 1:
@@ -73,9 +73,9 @@ def base3(num):
 		s = str(digit) + s
 	return s
 
-for i in range(1, 31):
+for i in range(1, 82):
 	answer = solve(i)+1
-	print('answer for {} is {}'.format(base3(i), base3(answer)))
+	print('answer for {} ({} base 3) is {} ({} base 3)'.format(i, base3(i), answer, base3(answer)))
 
 # I guessed that the above pattern would hold true for all n.  On
 # this assumption, I hand-computed an answer, which turned out to
