@@ -1,4 +1,5 @@
 import inspect, os
+import copy
 import datetime
 import math
 import Queue
@@ -86,25 +87,43 @@ class Grid(object):
 		if y >= self.grid_height:
 			self.grid_height = y + 1
 
-	def node_index(self, x, y):
-		return y*self.grid_height + x
-
+	def xy_is_in_bounds(self, x, y):
+		return x >= 0 and x < self.grid_width and y >= 0 and y < self.grid_height
+	
 	# Returns a (size, used) tuple.
 	def node_at_xy(self, x, y):
 		if x < 0 or x >= self.grid_width or y < 0 or y >= self.grid_height:
 			print('FATAL ERROR: ({},{}) out of bounds'.format(x, y))
 			exit()
 		return self.nodes_by_xy[(x, y)]
+
+	def can_move_from_to(self, from_x, from_y, to_x, to_y):
+		if not self.xy_is_in_bounds(from_x, from_y):
+			return False
+		if not self.xy_is_in_bounds(to_x, to_y):
+			return False
+		from_node = self.node_at_xy(from_x, from_y)
+		to_node = self.node_at_xy(to_x, to_y)
+		return from_node.used + to_node.used <= to_node.size
+
+	def move_from_to(self, from_x, from_y, to_x, to_y):
+		if not self.can_move_from_to(from_x, from_y, to_x, to_y):
+			print('FATAL ERROR: overflow while moving load from ({},{}) to ({},{})'.format(from_x, from_y, to_x, to_y))
+			exit()
+		from_node = self.node_at_xy(from_x, from_y)
+		to_node = self.node_at_xy(to_x, to_y)
+		to_node.used += from_node.used
+		from_node.used = 0
 	
-	def swap_nodes(self, from_x, from_y, to_x, to_y):
-		save_node = self.nodes_by_xy[(from_x, from_y)]
-		self.nodes_by_xy[(from_x, from_y)] = self.nodes_by_xy[(to_x, to_y)]
-		self.nodes_by_xy[(to_x, to_y)] = save_node
+	def can_move_empty_by_xy(self, dx, dy):
+		(from_x, from_y) = (self.empty_x + dx, self.empty_y + dy)
+		(to_x, to_y) = (self.empty_x, self.empty_y)
+		return self.can_move_from_to(from_x, from_y, to_x, to_y)
 	
 	def move_empty_by_xy(self, dx, dy):
 		(from_x, from_y) = (self.empty_x + dx, self.empty_y + dy)
 		(to_x, to_y) = (self.empty_x, self.empty_y)
-		self.swap_nodes(from_x, from_y, to_x, to_y)
+		self.move_from_to(from_x, from_y, to_x, to_y)
 		(self.empty_x, self.empty_y) = (from_x, from_y)
 		if (from_x, from_y) == (self.goal_x, self.goal_y):
 			(self.goal_x, self.goal_y) = (to_x, to_y)
@@ -134,6 +153,15 @@ class Grid(object):
 				exit()
 			if verbose:
 				self.dump()
+
+	def possible_new_grids(self):
+		grids = []
+		for (dx, dy) in ((0, 1), (1, 0), (0, -1), (-1, 0)):
+			if self.can_move_empty_by_xy(dx, dy):
+				new_grid = copy.deepcopy(self)
+				new_grid.move_empty_by_xy(dx, dy)
+				grids.append(new_grid)
+		return grids
 
 	def print_overview(self):
 		min_used_excluding_empty = 10000
@@ -166,18 +194,39 @@ class Grid(object):
 					s += '.'
 			print(s)
 
+	def solve(self):
+		search_queue = Queue.Queue()
+		search_queue.put((self, 0))  # (grid, depth) pair.
+		visited_states = set()
+		depth_so_far = 0
+
+		while not search_queue.empty():
+			(grid, depth) = search_queue.get()
+			visited_states.add(grid.info_tuple())
+			if depth > depth_so_far:
+				depth_so_far = depth
+				print('[{}] depth so far is {}, approx queue size is {}'.format(datetime.datetime.now(), depth_so_far, search_queue.qsize()))
+			for new_grid in grid.possible_new_grids():
+				if new_grid.goal_x == 0 and new_grid.goal_y == 0:
+					print('[{}] AHA -- answer is depth {}.'.format(datetime.datetime.now(), depth + 1))
+					return
+				if new_grid.info_tuple() in visited_states:
+					continue
+				search_queue.put((new_grid, depth + 1))
+
+#grid = Grid()
+#grid.load_input(get_input_lines("test.txt"))
+#grid.print_nodes()
+#grid.print_overview()
+#print('initial grid:')
+#grid.dump()
+#grid.move_empty_with_commands('URDLLUR', verbose = True)
+
 grid = Grid()
 grid.load_input(get_input_lines("test.txt"))
-grid.print_nodes()
 grid.print_overview()
-print('initial grid:')
-grid.dump()
-grid.move_empty_with_commands('URDLLUR', verbose = True)
+grid.solve()
 
-#grid = Grid(get_input_lines("input.txt"))
-#grid.print_overview() 
-#grid.move_empty_with_commands('L' + ('U'*27))
-#grid.dump()
 
 
 
