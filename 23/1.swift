@@ -34,14 +34,6 @@ class Instruction: CustomStringConvertible {
 		}
 	}
 	
-	func toggle() {
-		if arg2 == nil {
-			op = (op == "inc" ? "dec" : "inc")  // One-argument instruction.
-		} else {
-			op = (op == "jnz" ? "cpy" : "jnz")  // Two-argument instruction.
-		}
-	}
-	
 	// MARK: - CustomStringConvertible
 	
 	var description: String {
@@ -73,24 +65,29 @@ struct Machine {
 		self.instructions = linesOfCode.map({ Instruction($0) })
 	}
 	
+	func getRegister(_ reg: String) -> Int {
+		return registers[reg]!
+	}
+	
 	mutating func setRegister(_ reg: String, _ value: Int) {
 		registers[reg] = value
 	}
-
+	
 	mutating func run() {
 		pc = 0
-		while true {
-			var jump = 1
-			let cmd = instructions[pc]
-			if cmd.hasCorrectArgTypes() {
-				jump = run(cmd)
-			}
-			pc += jump
-			if pc >= instructions.count {
-				break
-			}
+		while pc < instructions.count {
+			if shouldMultiply() {
+				multiply()
+			} else {
+				// Normal flow.
+				let cmd = instructions[pc]
+				if cmd.hasCorrectArgTypes() {
+					execute(cmd)
+				} else {
+					pc += 1
+				}
+			}			
 		}
-		printRegisters()
 	}
 	
 	func printRegisters() {
@@ -98,30 +95,79 @@ struct Machine {
 	}
 
 	func printProgram() {
-		for cmd in instructions {
-			print(cmd)
+		for (i, cmd) in instructions.enumerated() {
+			let s = NSString(format: "%2d", i)
+			print("\(s) \(cmd)")
 		}
 	}
 
-	// Returns number of instructions to jump.
-	private mutating func run(_ cmd: Instruction) -> Int {
+	// Hand-optimize this sequence of instructions, which sets a = a*b and clears c and d.
+	//	cpy a d
+	//	cpy 0 a
+	//	cpy b c
+	//	inc a
+	//	dec c
+	//	jnz c -2
+	//	dec d
+	//	jnz d -5
+	private mutating func multiply() {
+		let product = registers["a"]! * registers["b"]!
+//		print("[multiply] a=\(registers["a"]!), b=\(registers["b"]!), assigning \(product) to a")
+		registers["a"] = product
+		registers["c"] = 0
+		registers["d"] = 0
+		pc += 8
+	}
+	
+	// Good enough sanity check of whether we're using the "real" Day 23 input
+	// (at least *my* Day 23 input) *and* none of the relevant instructions
+	// has been modified by a "tgl" instruction.
+	private func shouldMultiply() -> Bool {
+		if pc != 2 || instructions.count < 10 {
+			return false
+		}
+		
+		let block = instructions[pc..<pc+8]
+		let ops = block.map({ $0.op })
+		if ops != ["cpy", "cpy", "cpy", "inc", "dec", "jnz", "dec", "jnz"] {
+			return false
+		}
+		
+		return true
+	}
+
+	private mutating func execute(_ cmd: Instruction) {
+		var jump = 1
+
 		switch cmd.op {
 		case "cpy": registers[cmd.arg2!] = value(cmd.arg1)
 		case "inc": registers[cmd.arg1]! += 1
 		case "dec": registers[cmd.arg1]! -= 1
 		case "jnz":
 			if value(cmd.arg1) != 0 {
-				return value(cmd.arg2!)
+				jump = value(cmd.arg2!)
 			}
-		case "tgl":
-			let addr = pc + value(cmd.arg1)
-			if addr >= 0 && addr < instructions.count {
-				instructions[addr].toggle()
-			}
+		case "tgl": toggle(pc + value(cmd.arg1))
 		default: fatalError("Invalid instruction: '\(cmd.op)'.")
 		}
 		
-		return 1
+		pc += jump
+	}
+	
+	private func toggle(_ addr: Int) {
+		if addr < 0 || addr >= instructions.count {
+			return
+		}
+		
+		let cmd = instructions[addr]
+		let newOp: String
+		if cmd.arg2 == nil {
+			newOp = (cmd.op == "inc" ? "dec" : "inc")  // One-argument instruction.
+		} else {
+			newOp = (cmd.op == "jnz" ? "cpy" : "jnz")  // Two-argument instruction.
+		}
+//		print("[toggle] instruction \(addr), \(cmd.op) => \(newOp)")
+		cmd.op = newOp
 	}
 	
 	private func value(_ term: String) -> Int {
@@ -135,13 +181,15 @@ struct Machine {
 	}
 }
 
-NSLog("START")
-var machine = Machine(getInputLines("input.txt"))
-machine.setRegister("a", 7)  // Part 1.
-//machine.setRegister("a", 12)  // Part 2.
-machine.run()
-NSLog("END")
+func solve(_ desc: String, _ a: Int) {
+	var machine = Machine(getInputLines("input.txt"))
+	machine.setRegister("a", a)
+	NSLog("START %@", desc)
+	machine.run()
+	NSLog("END %@ -- register 'a' contains %ld", desc, machine.getRegister("a"))
+}
 
-
-
+solve("Part 1", 7)
+print("")
+solve("Part 2", 12)
 
