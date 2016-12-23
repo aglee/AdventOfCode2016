@@ -8,7 +8,7 @@ def readInputLines():
 
 def fatalError(message):
 	print("FATAL ERROR: " + message)
-	exit
+	exit()
 
 def run(registers):
 	def value(term):
