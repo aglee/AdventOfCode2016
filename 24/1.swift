@@ -15,6 +15,10 @@ class MapState: Hashable, CustomStringConvertible {
 	let digitsMask: Int  // Bitmask indicating which digits have been visited.
 	var parentState: MapState?
 	
+	
+	var DEPTH = 0
+	
+	
 	init(_ position: Point, _ digitsMask: Int) {
 		self.position = position
 		self.digitsMask = digitsMask
@@ -26,7 +30,7 @@ class MapState: Hashable, CustomStringConvertible {
 
 	var hashValue: Int { return ((position.y ^ position.x) << 10) & digitsMask }
 	
-	var description: String { return "\(position) \(String(digitsMask, radix: 2))" }
+	var description: String { return "\(position) \(String(digitsMask, radix: 2)) DEPTH=\(DEPTH)" }
 }
 
 class Map {
@@ -37,7 +41,7 @@ class Map {
 	private var rows: [[String]]
 	private var digitLocations: [Int: Point]  // Maps digits to their locations on the Map.
 	private var digitMap: [[Int]]  // -1 means no digit, 0-9 is the digit.
-	private let desiredDigitsMask: Int!
+	var numberOfDigits: Int { return digitLocations.count }
 
 	init(_ lines: [String]) {
 		self.width = lines[0].characters.count
@@ -59,18 +63,12 @@ class Map {
 			}
 		}
 		
-		self.desiredDigitsMask = (1 << digitLocations.count) - 1
-		
 		// Sanity check: make sure the digits we found on the map are sequential,
 		// since we have logic elsewhere that assumes this.
 		let maxDigit = digitLocations.keys.sorted().last!
 		if maxDigit != digitLocations.count - 1 {
 			fatalError("Digits aren't sequential: \(digitLocations.keys.sorted())")
 		}
-	}
-
-	func initialMapState() -> MapState {
-		return MapState(digitLocations[0]!, 0)
 	}
 
 	func isWall(_ x: Int, _ y: Int) -> Bool {
@@ -91,22 +89,27 @@ class Map {
 		}
 	}
 
-	func solve() {
+	func solve(startDigit: Int, goalDigit: Int) -> MapState {
+		let desiredDigitsMask = 1<<goalDigit
+	
 		var visited = Set<MapState>()
-		var frontier = Set<MapState>([initialMapState()])
-		while frontier.count > 0 {
+		var frontier = Set<MapState>([MapState(digitLocations[startDigit]!, 0)])
+		
+		var MAX_DEPTH = 0
+		
+		while true {
 			// Find all reachable neighbors of the current frontier,
 			// and construct the next frontier.
 			var newFrontier = Set<MapState>()
 			for state in frontier {
 				if state.digitsMask == desiredDigitsMask {
-					print("GOOOOAL: state = \(state)")
-					var st: MapState? = state
-					while st != nil {
-						print("\(st!)")
-						st = st!.parentState
-					}
-					return
+//					print("smallest number of steps from \(startDigit) to \(goalDigit) is \(state.DEPTH)")
+//					var st: MapState? = state
+//					while st != nil {
+//						print("\(st!)")
+//						st = st!.parentState
+//					}
+					return state
 				}
 
 				visited.insert(state)
@@ -123,123 +126,35 @@ class Map {
 						let neighbor = MapState(neighborPoint, neighborDigitsMask)
 						if !visited.contains(neighbor) {
 							neighbor.parentState = state
+							neighbor.DEPTH = state.DEPTH + 1
 							newFrontier.insert(neighbor)
 						}
 					}
 				}
 			}
 
+			MAX_DEPTH += 1
+//			if MAX_DEPTH % 5 == 0 {
+//				NSLog("MAX_DEPTH %ld", MAX_DEPTH)
+//			}
 			frontier = newFrontier
+			if frontier.count == 0 {
+				fatalError("Hey, we should have found a solution.")
+			}
 		}
-		fatalError("Hey, we should have found a solution.")
 	}
 }
 
-let inputLines = parseInput(fileName: "test.txt")
-let m = Map(inputLines)
-m.dump()
-m.solve()
+let inputLines = parseInput(fileName: "input.txt")
+var m = Map(inputLines)
+for i in 0..<(m.numberOfDigits - 1) {
+	for j in (i + 1)..<m.numberOfDigits {
+		NSLog("START %d %d", i, j)
+		let state = m.solve(startDigit: i, goalDigit: j)
+		NSLog("END %d %d %d", i, j, state.DEPTH)
+		print("")
+	}
+}
 
 
 
-
-
-
-
-
-//
-//
-//// This is my final solution for Day 14, pulling things from previous
-//// solutions (see the "Previous" directory) into this self-contained file.
-//
-//struct MazePoint: Hashable, CustomStringConvertible {
-//	let x: Int
-//	let y: Int
-//
-//	init(_ x: Int, _ y: Int) { (self.x, self.y) = (x, y) }
-//
-//	static func ==(lhs: MazePoint, rhs: MazePoint) -> Bool {
-//		return lhs.x == rhs.x && lhs.y == rhs.y
-//	}
-//
-//	var hashValue: Int { return x ^ y }
-//
-//	var description: String { return "\((x, y))" }
-//}
-//
-//typealias PointSet = Set<MazePoint>
-//
-//enum SolutionCriterion {
-//	case part1(goalSquare: MazePoint)
-//	case part2(maxStepsWalked: Int)
-//}
-//
-//struct Day14 {
-//	let favoriteNumber: Int
-//
-//	func squareIsOpen(_ point: MazePoint) -> Bool {
-//		let (x, y) = (point.x, point.y)
-//		if x < 0 || y < 0 {
-//			return false
-//		}
-//		let numBits = bitCount(x*x + 3*x + 2*x*y + y + y*y + favoriteNumber)
-//		return numBits & 1 == 0
-//	}
-//
-//	func bitCount(_ num: Int) -> Int {
-//		var n = num
-//		var bitCount = 0
-//		while n != 0 {
-//			if n & 1 != 0 {
-//				bitCount += 1
-//			}
-//			n = n>>1
-//		}
-//		return bitCount
-//	}
-//
-//	func solve(_ reasonToEnd: SolutionCriterion) {
-//		var visited = PointSet()
-//		var frontier = PointSet([MazePoint(1, 1)])
-//		var stepsWalked = 0  // Number of steps we have taken from the start square.
-//		while true {
-//			// Find all reachable neighbors of the current frontier,
-//			// and construct the next frontier.
-//			var newFrontier = PointSet()
-//			for point in frontier {
-//				if case .part1(let goal) = reasonToEnd {
-//					if point == goal {
-//						print("PART 1: depth = \(stepsWalked)")
-//						return
-//					}
-//				}
-//
-//				visited.insert(point)
-//
-//				// Expand the frontier to include unvisited neighbors.
-//				for (dx, dy) in [(0, 1), (1, 0), (0, -1), (-1, 0)] {
-//					let neighbor = MazePoint(point.x + dx, point.y + dy)
-//					if !visited.contains(neighbor) && squareIsOpen(neighbor) {
-//						newFrontier.insert(neighbor)
-//					}
-//				}
-//			}
-//
-//			if case .part2(let maxStepsWalked) = reasonToEnd {
-//				// If maxStepsWalked is 50, we want to go through this loop 51 times.
-//				if stepsWalked == maxStepsWalked {
-//					print("PART 2: visited \(visited.count) squares")
-//					return
-//				}
-//			}
-//
-//			frontier = newFrontier
-//			stepsWalked += 1
-//		}
-//	}
-//}
-//
-////Day14(favoriteNumber: 10).solve(.part1(goalSquare: MazePoint(7, 4)))  // Should be 11.
-//Day14(favoriteNumber: 1352).solve(.part1(goalSquare: MazePoint(31, 39)))
-//Day14(favoriteNumber: 1352).solve(.part2(maxStepsWalked: 50))
-//
