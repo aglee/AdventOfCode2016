@@ -1,3 +1,5 @@
+# coding: utf8
+
 import AStar
 import datetime
 import heapq
@@ -103,16 +105,15 @@ class PuzzleSearchNode(GenericGrid):
 				load = self.get(x, y)
 				tiering.add(load)
 				if (x, y) == self.payload_xy:
-					s += 'G'
+					s += u'🐙'
 				elif load == 0:
-					s += '_'
+					s += u'❤️'
 				elif load > 100:
-					s += '#'
+					s += u'⬛️'
+				elif (x, y) in nodes_to_highlight:
+					s += u'❤️'
 				else:
-					if (x, y) in nodes_to_highlight:
-						s += '@'
-					else:
-						s += '.'
+					s += u'⬜️'
 			print(s)
 		print('load tiers: {}'.format(tiering.summary()))
 		
