@@ -1,0 +1,30 @@
+cpy a d	; set a = d = a+2538, call this p
+	cpy 9 c	; LOOP 9 times, i.e. set d = d+2538, b = c = 0
+		cpy 282 b	; set d = d + 282, b = 0
+			inc d		; LOOP set d = d + 282, b = 0
+			dec b
+			jnz b -2	; END LOOP
+	dec c
+	jnz c -5	; END LOOP; note that d never changes hereafter
+cpy d a	; LOOP: set a = d; note: nothing below branches above this line, plus this is an infinite loop
+	jnz 0 0	; LOOP; each iteration uses a to set a and b
+		cpy a b	; set b = a
+		cpy 0 a	; set a = 0
+		cpy 2 c	; LOOP; c is 2 on entry; purpose is to set a and b
+			jnz b 2	; X:
+			jnz 1 6
+			dec b
+			dec c
+			jnz c -4	; if c!=0 GOTO X
+			inc a		; a++
+		jnz 1 -7	; END LOOP; on exiting this loop, c is is either 1 or 2 (it starts the loop at 2, and gets decremented inside the loop, and if it gets decremented to 0 the loop will iterate again and start by resetting it to 2; so the question is, under what conditions will c be 1, and when will it be 2?
+		cpy 2 b	; set b = 2 - c; I'm guessing b will always be 0 or 1, which would mean c is 1 or 2
+			jnz c 2	; LOOP; set b = b - c, c = 0
+				jnz 1 4
+				dec b
+				dec c
+			jnz 1 -4	; END LOOP
+			jnz 0 0	; nop
+		out b		; output b, the last thing we do at the bottom of this infinite loop
+	jnz a -19	; END LOOP; if a has become 0, start the loop by resetting it to d (which, recall, is original a plus 2538)
+jnz 1 -21	; END LOOP; this is an infinite loop
